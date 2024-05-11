@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 public class HomePage extends JFrame implements ActionListener {
     JPanel mainPanel;
     JButton patientButton;
@@ -27,6 +26,7 @@ public class HomePage extends JFrame implements ActionListener {
         doctorButton = new JButton("Doctor Panel");
         doctorButton.setBounds(150,200,150,50);
         doctorButton.setFocusable(false);
+        doctorButton.addActionListener(this);
         doctorButton.setBackground(new Color(53, 165, 79));
 
         mainPanel.setBackground( new Color(205, 205, 225 ));
@@ -47,6 +47,10 @@ public class HomePage extends JFrame implements ActionListener {
         if (e.getSource()==patientButton){
             Patient patient = new Patient();
             patient.setVisible(true);
+        }
+        if (e.getSource()==doctorButton){
+            Doctor doctor = new Doctor();
+            doctor.setVisible(true);
         }
     }
 }

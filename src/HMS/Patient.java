@@ -22,6 +22,7 @@ public class Patient extends JFrame implements ActionListener {
     JTextField textField6;
     JTextArea patientTextArea;
     static Map<Integer, PatientInfo> patientsMap;
+    boolean updateMode = false;
 
     public Patient() {
 
@@ -38,7 +39,7 @@ public class Patient extends JFrame implements ActionListener {
 
         String[] labelsText = {"Name:", "Surname:", "Age:", "Contact info:", "Gender:", "Doctor category:"};
         JLabel[] labels = new JLabel[labelsText.length];
-
+        // Text Labels
         for (int i = 0; i < labelsText.length; i++) {
             labels[i] = new JLabel(labelsText[i]);
             labels[i].setFont(labelFont);
@@ -72,6 +73,7 @@ public class Patient extends JFrame implements ActionListener {
 
 
         //Down Panel
+
         downPanel = new JPanel(new GridLayout(2, 2));
         downPanel.setPreferredSize(new Dimension(500, 150));
         submitButton = new JButton("submit");
@@ -103,7 +105,7 @@ public class Patient extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-            //submitButton****************************submitButton
+        //submitButton************************************submitButton
         if (e.getSource() == submitButton) {
             // Check for empty fields
             if (textField1.getText().isEmpty() || textField2.getText().isEmpty() ||
@@ -127,11 +129,10 @@ public class Patient extends JFrame implements ActionListener {
 
                 // Add object to the HashMap
                 patientsMap.put(patientInfo.getId(), patientInfo);
-
+                updatePatientArea();
                 JOptionPane.showMessageDialog(this, "patient Information has been saved successfully");
 
                 // Update patient area and clear fields
-                updatePatientArea();
                 clearFields();
 
             } catch (NumberFormatException ex) {
@@ -143,59 +144,65 @@ public class Patient extends JFrame implements ActionListener {
         //updateButton*****************************************updateButton
         if (e.getSource() == updateButton) {
             try {
-                String userIdInput = JOptionPane.showInputDialog(this,
-                        "Enter the patient ID number", "Updating", JOptionPane.QUESTION_MESSAGE);
-                if (userIdInput != null && !userIdInput.isEmpty()) {
+                PatientInfo existingPatient = searchPatientById();
+                int existingPatientID = existingPatient.getId();
+                if (existingPatient != null) {
+                   // if (!updateMode) { // Entering update mode
+                        // Populate text fields with existing patient info
+                        textField1.setText(existingPatient.getName());
+                        textField2.setText(existingPatient.getSurname());
+                        textField3.setText(Integer.toString(existingPatient.getAge()));
+                        textField4.setText(existingPatient.getContactInfo());
+                        textField5.setText(existingPatient.getGender());
+                        textField6.setText(existingPatient.getDoctorCategory());
 
-                    int patientId = Integer.parseInt(userIdInput);
-                    // Retrieve the existing patient info
-                    PatientInfo existingPatient = patientsMap.get(patientId);
-                    if (existingPatient != null) {
-                        existingPatient.setName(textField1.getText());
-                        existingPatient.setSurname(textField2.getText());
-                        existingPatient.setAge(Integer.parseInt(textField3.getText()));
-                        existingPatient.setContactInfo(textField4.getText());
-                        existingPatient.setGender(textField5.getText());
-                        existingPatient.setDoctorCategory(textField6.getText());
-                        SwingUtilities.invokeLater(() -> {
-                            // Update the patient information in the text area
-                            patientTextArea.setText(getPatientInfo(patientId));
-                            patientTextArea.setCaretPosition(0);
-                            patientTextArea.requestFocusInWindow();
-                        });
+                        String updatedName = textField1.getText();
+                        String updatedSurname = textField2.getText();
+                        int updatedAge = Integer.parseInt(textField3.getText());
+                        String updatedContactInfo = textField4.getText();
+                        String updatedGender = textField5.getText();
+                        String updatedDoctorCategory = textField6.getText();
+
+                        // Delete existing patient
+                        patientsMap.remove(existingPatientID);
+
+                        // Create and add updated patient
+                        PatientInfo updatedPatient = new PatientInfo(updatedName, updatedSurname, updatedAge,
+                                updatedContactInfo, updatedGender, updatedDoctorCategory);
+                        updatedPatient.setId(existingPatientID);
+                        patientsMap.put(existingPatientID, updatedPatient);
+                        updatePatientArea();
                         JOptionPane.showMessageDialog(this, "Patient information updated successfully");
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Patient with ID " + patientId + " not found.",
-                                "Patient Not Found", JOptionPane.ERROR_MESSAGE);
-                    }
+                        updateMode = false; // Exiting update mode
+                } else {
+                    JOptionPane.showMessageDialog(this, "Patient with ID " + existingPatientID + " not found.",
+                            "Patient Not Found", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Invalid input for patient ID. Please enter a valid integer.",
+                JOptionPane.showMessageDialog(this, "Invalid input for patient ID or age. Please enter valid integers.",
                         "Input Error", JOptionPane.ERROR_MESSAGE);
             }
         }
-
-        if (e.getSource() ==deleteButton){
+        //*************************deleteButton*******************
+        if (e.getSource() == deleteButton) {
             try {
-                String userIdInput = JOptionPane.showInputDialog(this,
-                        "Enter the patient ID number", "Updating", JOptionPane.QUESTION_MESSAGE);
-                int patientIdToRemove = Integer.parseInt(userIdInput);
+                // Search for the patient by ID
+                PatientInfo patientToDelete = searchPatientById();
 
-                if (!userIdInput.isEmpty()) {
-                    patientsMap.remove(patientIdToRemove);
-                    JOptionPane.showMessageDialog(this, "patient Information has been successfully deleted!");
-
+                if (patientToDelete != null) {
+                    patientsMap.remove(patientToDelete.getId());
+                    updatePatientArea();
+                    clearFields();
+                    JOptionPane.showMessageDialog(this, "Patient information has been successfully deleted!");
                 } else {
-                    JOptionPane.showMessageDialog(this,
-                            "Patient with ID " + patientIdToRemove +
-                                    " not found.", "Patient Not Found", JOptionPane.ERROR_MESSAGE);
-
+                    JOptionPane.showMessageDialog(this, "Patient not found.",
+                            "Patient Not Found", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this,
-                            "Invalid input for patient ID. Please enter a valid integer.",
-                            "Input Error", JOptionPane.ERROR_MESSAGE);
-                }
+                JOptionPane.showMessageDialog(this,
+                        "Invalid input for patient ID. Please enter a valid integer.",
+                        "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -215,7 +222,34 @@ public class Patient extends JFrame implements ActionListener {
         textField5.setText("");
         textField6.setText("");
     }
-    private static String getPatientInfo(int patientId) {
+
+    public PatientInfo searchPatientById() {
+        try {
+            String userIdInput = JOptionPane.showInputDialog(this,
+                    "Enter the patient ID number", "Updating", JOptionPane.QUESTION_MESSAGE);
+            if (userIdInput != null && !userIdInput.isEmpty()) {
+                int patientId = Integer.parseInt(userIdInput);
+                PatientInfo patientInfo = patientsMap.get(patientId);
+                if (patientInfo != null) {
+                    return patientInfo;
+                } else {
+                    // Display error message if patient ID is not found
+                    JOptionPane.showMessageDialog(this,
+                            "Patient with ID " + patientId + " not found.",
+                            "Patient Not Found", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                return null;
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Invalid input for patient ID. Please enter a valid integer.",
+                    "Input Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return null;
+    }
+
+    public static String getPatientInfo(int patientId) {
         PatientInfo patientInfo = patientsMap.get(patientId);
         if (patientInfo != null) {
             return "Patient ID: " + patientId +
@@ -230,4 +264,5 @@ public class Patient extends JFrame implements ActionListener {
         }
     }
 }
+
 

@@ -63,7 +63,11 @@ public class PatientInfo {
         this.doctorCategory = doctorCategory;
     }
     public int getId() {
-        return this.createID();
+//        return this.createID();
+        return this.id;
+    }
+    public void setId(int id) {
+        this.id = id;
     }
 
     // generate a 3 digits number as ID
@@ -82,6 +86,7 @@ public class PatientInfo {
                 " Gender: " + gender +
                 " Doctor Category: " + doctorCategory;
     }
+
 }
 
 
