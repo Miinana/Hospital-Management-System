@@ -1,4 +1,6 @@
 package HMS;
+import HMS.view.HomePage;
+
 import javax.swing.*;
 public class Main {
     public static void main(String[]args){

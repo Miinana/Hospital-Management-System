@@ -1,7 +1,9 @@
-package HMS;
+package HMS.model;
 
+import HMS.controller.PatientService;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.SplittableRandom;
 
 public class PatientInfo {
     private String name;
@@ -11,6 +13,9 @@ public class PatientInfo {
     private String contactInfo;
     private String gender;
     private String doctorCategory;
+    private String prescription;
+    private String comment;
+    private String nextCheckUp;
     HashMap<String, PatientInfo> patientInfoHashMap;
 
     public PatientInfo(String name, String surname, int age, String contactInfo, String gender, String doctorCategory) {
@@ -20,18 +25,16 @@ public class PatientInfo {
         this.contactInfo = contactInfo;
         this.gender = gender;
         this.doctorCategory = doctorCategory;
-        this.id = createID();
+        this.id = PatientService.getInstance().createID();
         patientInfoHashMap = new HashMap<>();
     }
 
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-
     public String getSurname() {
         return surname;
     }
@@ -63,18 +66,31 @@ public class PatientInfo {
         this.doctorCategory = doctorCategory;
     }
     public int getId() {
-//        return this.createID();
         return this.id;
     }
     public void setId(int id) {
         this.id = id;
     }
 
-    // generate a 3 digits number as ID
-    public int createID() {
-        Random random = new Random();
-        return random.nextInt(900) + 100;
+    public String getPrescription() {
+        return prescription;
     }
+    public void setPrescription(String prescription) {
+        this.prescription = prescription;
+    }
+    public String getComment() {
+        return comment;
+    }
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+    public String getNextCheckUp() {
+        return nextCheckUp;
+    }
+    public void setNextCheckUp(String nextCheckUp) {
+        this.nextCheckUp = nextCheckUp;
+    }
+
 
     public String toString() {
         return "Patient Information:" +
@@ -86,7 +102,4 @@ public class PatientInfo {
                 " Gender: " + gender +
                 " Doctor Category: " + doctorCategory;
     }
-
 }
-
-
